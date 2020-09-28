@@ -1,4 +1,4 @@
-toy_network
+Toy Network
 ==============================
 
 A toy network for testing network tomography approaches. The primary driver is currently the Jupyter notebook that was used for testing, though key functions for generating graphs and visualizations of both graphs and graph data have been factored out into their respective files in the src folder.
