@@ -1,0 +1,230 @@
+\documentclass{weeklyreport}
+\usepackage[utf8]{inputenc}
+
+%%% Template Usage
+% 1. Go to "All Projects" and make a copy in Overleaf,
+% or download the source to modify locally.
+% 2. Fill in your name
+% 3. Set the reportdate to Monday of the current week
+
+
+\title{Progress Report}
+\author{Edris Qarghah}
+
+\DTMsavedate{reportdate}{2020-07-20}
+\date{Week of \DTMusedate{reportdate}}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Weekly Goals}
+
+
+\begin{itemize}
+	\item Learn about tomography strategies.
+	\item Develop tomography of static network (e.g., with latency/packet loss).
+	\item Ensure perfSONAR node distribution allows visibility into entire network.
+	\item Generate, store and draw shortest paths between PS nodes.
+	\item Stretch: Simulate network activity.
+	\item Stretch: Generate time series data based on that activity.
+	\item Stretch: Learn how this connects to anomaly detection.
+	\item Stretch: Explore how the model can be applied to real network data.
+\end{itemize}
+
+\section*{Daily Log}
+
+\subsection*{\weekday{0}}
+
+\begin{itemize}
+    \item Network Analytics Discussion meeting.
+    \begin{itemize}
+    	\item Shawn suggested there may be a paper on network topology.
+    	\item Shawn shared details about how the network is structured.
+    	\begin{itemize}
+    		\item Points of Presence (PoP)
+    		\item ESNet (originally for Department of Energy labs only, but became available to high energy physics labs associated with LHC1) connected to universities which are predominantly on Internet 2.
+    	\end{itemize}
+    	\item Shawn suggested that end nodes that have only one connection to the toy network should be PerfSonar nodes (otherwise, we would have no reason to traverse to them and wouldn't even know they were there.
+    	\item Potential graph augmentation: Create two networks (ESNet and Internet2) and connect them.
+    \end{itemize}
+    \item Read about \href{https://blog.stackpath.com/point-of-presence/}{Points of Presence}, as that was a term I wasn't familiar with.
+    \item \href{https://blog.dbrgn.ch/2011/2/22/a-simple-latex-makefile/}{Read about \LaTeX  makefiles} (and makefiles in general) and finally got a working one that will not require babysitting with every new weekly progress report.
+    \item Worked on Shawn's PerfSonar suggestion.
+\end{itemize}
+
+
+
+\subsection*{\weekday{1}}
+
+\begin{itemize}
+    \item Spoke with Ilija about static network tomography. He suggested I:
+    \begin{itemize}
+    	\item Create a histogram showing the sum of latency across all hops between every pair of PerfSonar nodes.
+    	\item Create a histogram showing the probability of a packet being lost between any two pairs of PerfSonar nodes (i.e., $1-\Pi_n (1-p_n)$ where $p_n$ is the probability a packet is lost on the $n$th edge).
+    	\item Remove a random edge and see the impact on the network.
+    	\begin{itemize}
+    		\item Recalculate packet loss. 
+    		\item For any pair of PerfSonar nodes whose packet loss changed, plot new histograms. 
+    		\item Check the original shortest paths between all pairs that have changed to determine what edges they have in common.
+    		\item Try to determine which edge was killed.
+    	\end{itemize}
+    \end{itemize}
+    \item Discussed future goals:
+    \begin{itemize}
+    	\item Add bandwidth (typically sampled every 5-6 hours).
+    	\item Use bandwidth in conjunction with paths to calculate impact of broken edge.
+    \end{itemize}
+    \item Create tomography .py and functions
+    \item Sent in time for 7/7-7/22.
+\end{itemize}
+
+\subsection*{\weekday{2}}
+
+\begin{itemize}
+    \item Create time tracking spreadsheet.
+    \item Learned about graphs:
+    \begin{itemize}
+    	\item Bridges are edges whose removal would increase the components in a graph.
+    	\item Bridge-connected components are the components that would be created if bridges were removed.
+    	\item Chain decomposition (didn't end up being relevant)
+    	\item Edge boundaries are edges that connect a set of nodes with nodes not in that set.
+    	\item Measures of centrality, most notably communicability betweenness centrality (credit to my wife for identifying this as a viable tool for ensuring PerfSonar dispersal).
+    \end{itemize}
+    \item Developed method to disperse PerfSonar nodes:
+    \begin{itemize}
+    	\item Find all bridge-connected components.
+    	\item If the number of components exceeds the PerfSonar count, create a new graph.
+    	\item Calculate communicability betweenness centrality (cbc) for all nodes.
+    	\item Sort the nodes in each component by cbc (lower betweenness means a node is on the periphery and is a better PerfSonar candidate).
+    	\item Order the components from smallest to largest and the cbc of its first node (to address issues like when two components have size one but one lies between the other and the rest of the graph).
+    	\item Make the first $k$ nodes of each component into PerfSonar nodes. 
+    	\begin{itemize}
+    		\item k = 1 + round(desired perfsonar nodes - number of clusters) / total nodes) 
+			\item Due to rounding, it is possible to not have assigned all perfsonar nodes by the end of this process, so we take the remaining ones from the next elements of the largest component.	
+    	\end{itemize}
+		\item Advantages of this approach:
+		\begin{itemize}
+			\item All 1-connected nodes are perfsonar nodes (because they become separate components and have connectivity 0)
+			\item All components contain at least one perfsonar node (so there are no clusters in the network completely lacking one)
+			\item We guarantee the requested number of total nodes and perfsonar nodes without having to add additional edges.
+			\item The use of cbc insures that the node connected to the bridge in any cluster is never selected.
+		\end{itemize}
+		\item Outstanding issues:
+		\begin{itemize}
+			\item If we have several an extended stretch of degree two nodes that end in a degree one node (i.e., they don't create a cycle), each one of those nodes will create a separate component. PerfSonar nodes cannot be adjacent, but that still means every other one of these nodes will be a PerfSonar node.
+		\end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection*{\weekday{3}}
+
+\begin{itemize}
+    \item Read (Service Analysis and Network Diagnosis) SAND project proposal for a better understanding of how I factor into this objective: "Using machine-learning techniques, develop a performance anomaly detection service to issue alerts and alarms about detected end-to-end performance degradation incidents."
+    \item Created and sent out \href{https://www.when2meet.com/?9419368-8jTlX}{When2Meet} for SAND Working Session.
+    \item Read more about \href{https://en.wikipedia.org/wiki/Centrality}{measures of network centrality} in the hopes of finding a faster alternative to betweenness.
+    \item Factored PerfSonar node generation out of initial graph generation.
+    \item Stored PerfSonar edgelist on Graph.
+    \item Created function to load saved graphs (to save time, because graph generation was getting expensive)
+    \item Found shortest paths between perfsonar nodes.
+    \item For each edge, store the paths it participates in.
+    \item Color-coded edges along paths between PerfSonar nodes.
+    \begin{itemize}
+    	\item Non-path edges are black and narrow.
+    	\item If an edge is part of multiple paths, it has an edge coloring for each one.
+    	\item The edge color and style cycle to allow differentiation of 40 different paths.
+    	\item Path coloring on an edge after the edge is initially drawn is semi-transparent.
+    	\item You can have variable width for edges or variable style (i.e., dotted) but not both.
+    	\item Read a LOT of documentation about \href{https://matplotlib.org/3.2.2/tutorials/colors/colormaps.html#sphx-glr-tutorials-colors-colormaps-py}{colormaps}, \href{https://matplotlib.org/3.2.2/tutorials/intermediate/color_cycle.html#sphx-glr-tutorials-intermediate-color-cycle-py}{style cycling}, \href{https://matplotlib.org/users/dflt_style_changes.html}{changes in how matplotlib handles colors}, \href{https://networkx.github.io/documentation/stable/reference/generated/networkx.drawing.nx_pylab.draw_networkx.html}{drawing} \href{https://networkx.github.io/documentation/stable/reference/generated/networkx.drawing.nx_pylab.draw_networkx_edges.html}{edges} in NetworkX, etc.
+    	\item Determined latency and packetloss along routes and plotted them in histograms.
+    \end{itemize}
+\end{itemize}
+
+
+\subsection*{\weekday{4}}
+
+\begin{itemize}
+	\item Finished reports.
+	\item Read about \href{https://en.wikipedia.org/wiki/Biconnected_component}{Biconnected} \href{https://networkx.github.io/documentation/stable/reference/algorithms/generated/networkx.algorithms.components.biconnected_components.html}{components} which were a consideration I did not take into account.
+	\item Got access to the SAND Google group and read up on \href{https://guides.github.com/activities/citable-code/}{citable code}.
+	\item Used \href{https://scholar.google.com}{Google Scholar} to search for literature on network topology. 
+\end{itemize}
+
+\section*{Achievements}
+\subsection*{I learned about...}
+\begin{itemize}
+	\item Makefiles
+	\item Points of Presence
+	\item SAND Project (read proposal)
+	\item Existing topology research
+	\item Basic static network tomography
+	\item Bridges, articulation points, edge boundaries, bridge and biconnected components
+	\item Measures of centrality (i.e., Communicability Betweenness Centrality)
+	\item How NetworkX and Matplotlib are conspiring against me (aka, edge drawing wonkiness and style cycling limitations)
+\end{itemize}
+
+\subsection*{I created...}
+\begin{itemize}
+	\item More robust networks:
+	\begin{itemize}
+		\item Ensured degree 1 nodes were PerfSonar nodes or removed.
+		\item Rethought this and decided to use bridge-connected components instead.
+		\begin{itemize}
+			\item Ditched networks that didn’t have enough ps nodes for the components
+			\item Distributed nodes proportional to component size
+		\end{itemize}
+		\item Used Communication Betweenness Centrality to ensure edge boundaries are not selected to be PS nodes.
+	\end{itemize}
+	\item Better visualizations of networks (differentiating edges is HARD):
+	\begin{itemize}
+		\item Changing color, edge style and width (but not all three)
+		\item Drawing edges separately		
+	\end{itemize}
+	\item Basic tomography histograms
+
+\end{itemize}
+
+\pagebreak
+\section*{Roadblocks}
+
+\subsection*{Questions}
+
+\begin{itemize}
+	\item How do I find a packetloss rate balance that doesn’t kill the network?
+	\item How should I handle articulation points?
+	\item How should I handle components that are really only a throughput to a PS node (ideally, these would be omitted from PS creation; there's a possible easy fix for degree 2, more difficult otherwise)?
+	\item How should I handle drawing changes in paths?
+\end{itemize}
+
+\subsection*{Problems}
+
+\begin{itemize}
+	\item Connectivity is expensive to calculate and slows down graph generation dramatically.
+	\item NetworkX has bizarre limitations on when/how it allows the styling of edges.
+	\item Strings of degree 2 nodes that end in a degree 1 node are each considered separate components, which results in over assignment of PS nodes.
+\end{itemize}
+
+\subsection*{Challenges}
+
+\begin{itemize}
+    \item Making sure the entire network is traversable from PS nodes.
+    \item Drawing paths on the network.
+\end{itemize}
+
+\section*{Plans for Next Week}
+
+\begin{itemize}
+	\item Further Static network tomography
+	\begin{itemize}
+		\item Determining dead edges from impact on shortest path
+		\item Add bandwidth and measure bandwidth impact
+	\end{itemize}
+	\item Draw ONE path at a time (see changes in a single route)
+	\item Simulate network activity
+	\item Measure activity from specific nodes/generate Time Series
+	\item Develop tools for tomography and anomaly detection
+\end{itemize}
+
+\end{document}

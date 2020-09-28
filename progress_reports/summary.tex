@@ -1,0 +1,218 @@
+\documentclass{weeklyreport}
+\usepackage[utf8]{inputenc}
+
+%%% Template Usage
+% 1. Go to "All Projects" and make a copy in Overleaf,
+% or download the source to modify locally.
+% 2. Fill in your name
+% 3. Set the reportdate to Monday of the current week
+
+
+\title{Progress Report}
+\author{Edris Qarghah}
+
+\DTMsavedate{reportdate}{2020-08-31}
+\date{Week of \DTMusedate{reportdate}}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Weekly Goals}
+
+
+\begin{itemize}
+	\item Real Network
+	\begin{itemize}
+		\item Find stable perfSONAR pairs
+		\begin{itemize}
+			\item Extract pairs from \texttt{trace\_derived\_v2} scan
+		\end{itemize}
+		\item Determine stable paths between PS pairs
+		\begin{itemize}
+			\item Create scan of \texttt{ps\_trace}
+			\item Determine how to iterate through scan efficiently
+			\item Determine centrality of nodes/edges
+		\end{itemize}
+	\end{itemize}
+	\item Adapting elements of Toy Network
+	\begin{itemize}
+		\item Edge omission detection
+		\item Network visualization
+	\end{itemize}
+\end{itemize}
+
+\section*{Daily Log}
+
+\subsection*{\weekday{0}}
+
+\begin{itemize}
+    \item Network Analytics Discussion
+    \begin{itemize}
+    	\item OSG All Hands talk slides for Shawn
+    	\item Register for OSG meeting
+    	\item A team has been working on creating issues in the network and trying to use that to map out nodes and grid points.
+    \end{itemize}
+    \item Spoke with Ilija about goals for the week.
+    \begin{itemize}
+		\item Get a clean sample from ElasticSearch, using a few hours of data.
+		\item Take only stable pairs (i.e., routes do not change).
+		\item Track these pairs over a few days to see if we can determine changes.
+	\end{itemize}
+	\item Updated login function, updating 
+	\texttt{[`atlas-kibana.mwt2.org']} to:\\ \texttt{[\{`host': `atlas-kibana.mwt2.org', `port': 9200, `scheme': `https'\}]}
+	\item Debugged issues with previous network\_analytics Main (possibly caused by being partway through changes when I went out sick).
+\end{itemize}
+
+
+\subsection*{\weekday{1}}
+
+\begin{itemize}
+    \item Improved documentation in network\_analytics (previous comments proved insufficient when debugging).
+    \item Factor out \texttt{query\_analysis}
+    \item Added \texttt{is\_ps\_pair}, \texttt{stable\_routes}, \texttt{get\_stable\_routes}, etc.
+    \item Modified \texttt{add\_bad\_pair} to handle updating global variables \texttt{routes}, \texttt{ps\_pairs}, \texttt{ps\_adj}, and \texttt{bad\_pairs} whenever a bad pair is added. 
+    \item Added new reasons for a pair being bad, that is determined when identifying routes: 'unstable' (meaning there is more than one sha for the route in the given time period) and 'looping'.
+\end{itemize}
+
+
+\subsection*{\weekday{2}}
+
+\begin{itemize}
+    \item Update \href{https://docs.google.com/presentation/d/1yhZD00L6rmlWaZqEWuJoyxXHYd7ig2KCs5Pt1tcVJmI/edit#slide=id.g5a8e0793b9_0_0}{slide} for Shawn's OSG meeting \href{https://docs.google.com/presentation/d/1Np9QAO-8Vcp2hRg7aPXhkaw-PlBhvpp1aMLx4lepfeM/edit?pli=1#slide=id.g5336f274a0_0_183}{presentation}.
+    \item Added \texttt{reset\_vars}
+    \item Spoke with Ilija
+    \begin{itemize}
+    	\item Important paths (used by many)
+    	\item Stable paths
+    	\item Plot on $x, y$
+    	\item Find which ones have changed
+    	\item Reflect paths that got effected
+    	\item Don't like approach: Arbitrary choice of three hours.
+    	\item Seven days worth of data. Collect all source/dest pairs. Sha and timestamp. Next time find the same document but with different SHA. Calculate difference in time. Half-life of a path.
+    	\item Plot: x average lifetime of path. y is number of paths that have that kind of stability.
+    	\item Don't consider paths at all, only edges. All edges. What are the edges that are most frequently used (core of the network)? 50 most used edges, connect in small tiny network. See how the network increases when allowing more edges. Should see start connecting. For each edge, how important is it.
+    \end{itemize}
+    \item Added \texttt{route\_changes} (recording time stamps when sha changed for a route) and \texttt{get\_route\_changes}.
+    \item Learned the meaning of RTFM.
+\end{itemize}
+
+\subsection*{\weekday{3}}
+
+\begin{itemize}
+	\item Informal SAND meeting
+	\begin{itemize}
+		\item Discussed issue with \texttt{filter\_path} in python.
+		\item Found that the solution is to include \href{https://stackoverflow.com/questions/41054121/usage-of-filter-path-with-helpers-scan-in-elastisearch-client}{scroll id and shards}
+	\end{itemize}
+	\item Iterating through an hour's worth of data takes 10 seconds. Doing something (i.e., recording details) while iterating through an hour's worth of data takes over a minute. This is too slow to feasibly be able to do work on days worth of data.
+	\item Appending individual lines to a dataframe is SLOW, writing to a csv and then converting to a df would probably be more efficient.
+	\item Writing to csv worked, but Ilija suggested using \href{https://arrow.apache.org/docs/python/parquet.html?highlight=pyarrow%5C%20parquet%5C%20partition}{pyarrow instead}
+	\item Develop plot on 50 minutes worth of data.
+	\item Read everything once, save it and then play with plots afterward.
+	\item Save a day at a time into parquet. Then develop on 1, expand at the end with all of them.
+	\item Used a 16 gb ram ML instance to run life of path on a full 7 days of data and write it to parquet
+	\item Iterated through 7 days of PS trace data, saving individual days of data to parquet.
+\end{itemize}
+
+
+\subsection*{\weekday{4}}
+
+\begin{itemize}
+	\item Loaded and read a day of data at a time to create frequency chart of nodes on paths
+	\item Graphed stability of paths
+	\begin{itemize}
+		\item Determined when routes changed
+		\item Determined length of time PS pairs were connected by any given path
+		\item Plotted results in log and linear scale and learned out to reverse the orientation of an axis in MatPlotLib
+	\end{itemize}
+	\item Created weekly reports
+\end{itemize}
+
+\section*{Achievements}
+\subsection*{I learned about...}
+\begin{itemize}
+	\item Pandas
+	\begin{itemize}
+		\item Means of creating DataFrames and, specifically, that its best to create them wholesale rather than create and then append them (as that requires copying the whole DataFrame again).
+		\item Drop columns, add columns, renaming, column calculations, etc.
+		\item Aggregations and groupings (used this to get counts)
+		\item Flattening lists (requires Python 3.6+)
+		\item Removing multi-indexing using reset index.
+	\end{itemize}
+	\item Writing large amounts of data
+	\begin{itemize}
+		\item CSV and PyArrow take roughly the same amount of time to write to, but PyArrow takes up a tenth the space.
+	\end{itemize}
+	\item Chaining generators ("yield from" in python 3.5+)
+	\item Improving ES Scans
+	\begin{itemize}
+		\item Removing fields using \texttt{\_source = [list of fields]}
+		\item Removing data metadata using \texttt{filter\_path} (requires keeping shards and index, otherwise query returns nothing).
+	\end{itemize}
+\end{itemize}
+
+\subsection*{I created...}
+\begin{itemize}
+	\item Improved ES scans for pulling data from \texttt{ps\_trace} and \texttt{trace\_derived\_v2}.
+	\item “Stable routes” as determined by whether the route changed at all over a given time period (we ultimately ditched this approach)
+	\item Means of saving scan results (list -> dataframe -> pyarrow) and loading
+	\item Edges from lists of hops
+	\item Frequency chart of nodes on paths
+	\item Means of determining route life
+	\begin{itemize}
+		\item Determined when routes changed
+		\item Determined length of time ps pairs were connected by any given path
+		\item Plotted the results in MatPlotLib
+	\end{itemize}
+
+\end{itemize}
+
+\pagebreak
+\section*{Roadblocks}
+
+\subsection*{Questions}
+
+\begin{itemize}
+	\item How much does direction matter when trying to determine edges that have performance issues?
+\end{itemize}
+
+\subsection*{Problems}
+
+\begin{itemize}
+	\item Updated pandas relies on python 3.6+ (0.24.2 is the highest available in 3.5)
+\end{itemize}
+
+\subsection*{Challenges}
+
+\begin{itemize}
+    \item Iterating through scans was taking too long.
+    \begin{itemize}
+    	\item It took 10 seconds per hour to iterate through and do nothing.
+    	\item It took over a minute to do some basic calculation on an hours worth of data (this meant 3.5+ hours to do the same on 7 days worth of data).
+    \end{itemize}
+    \item My iPython kernel died multiple times, but I was able to work around these restrictions by increasing the amount of RAM on my ML instance to 16 GB and by batching.
+\end{itemize}
+
+\section*{Plans for Next Week}
+
+\begin{itemize}
+	\item Get edge statistics
+	\begin{itemize}
+		\item Convert list of nodes to lists of edges
+		\item Determine frequency of edges
+	\end{itemize}
+	\item Draw core network
+	\begin{itemize}
+		\item Plot the $n$ most frequent edges
+	\end{itemize}
+	\item Network Tomography
+	\begin{itemize}
+		\item Determine criteria to trigger investigation (i.e., spike in OWD, increased packetloss)
+		\item Determine edges along troubled routes that are now omitted
+	\end{itemize}
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,258 @@
+\documentclass{weeklyreport}
+\usepackage[utf8]{inputenc}
+
+%%% Template Usage
+% 1. Go to "All Projects" and make a copy in Overleaf,
+% or download the source to modify locally.
+% 2. Fill in your name
+% 3. Set the reportdate to Monday of the current week
+
+
+\title{Progress Report}
+\author{Edris Qarghah}
+
+\DTMsavedate{reportdate}{2020-08-10}
+\date{Week of \DTMusedate{reportdate}}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Weekly Goals}
+
+
+\begin{itemize}
+	\item Real Network
+	\begin{itemize}
+		\item Learn about ElasticSearch, the structure of our data and how to query it.
+		\item Dive into \href{https://github.com/sand-ci/Analytics}{Sushant’s code} to see what I can learn and re-use.
+		\item Determine unique pairs of PerfSonar nodes that are actively transmitting to one another.
+		\item Take snapshots of traceroutes at various times for comparison.
+		\item Try to determine whether traceroute variation can be used in the same manner as in toy network to identify dead/ailing edges.
+	\end{itemize}
+	\item Toy Network (Postponed)
+	\begin{itemize}
+		\item Further static network tomography:
+		\begin{itemize}
+			\item Dead vs. throttled edges
+			\item Adjusting for change to variable number of edges
+			\item Add bandwidth and measure bandwidth impact
+			\item Edge removal heatmap
+		\end{itemize}
+		\item Simulate network activity
+		\item Measure activity from specific nodes/generate Time Series
+		\item Develop tools for tomography and anomaly detection
+	\end{itemize}
+\end{itemize}
+
+\section*{Daily Log}
+
+\subsection*{\weekday{0}}
+
+\begin{itemize}
+    \item Network Analytics Discussion meeting.
+    \begin{itemize}
+    	\item Manjari discussed issues with flask app. Suggestion was to develop from Windows.
+    	\item Petya had laptop issues. Worked on PS\_Dash with problematic hosts. Issues with visualizing data with chart that was difficult to configure. Was creating too many instances of base class, working to create a singleton.
+    	\item Soundar was working on the ingester and tracking high water marks in RabbitMQ (message count was going up but wasn't reflected in the interface). Plans to include timestamp logs for RMQ bus message count.
+    	\item Tommy worked on Dashboard visualization stuff in Kibana. Dropdown selection menus were not populating with all source and destination host IPs (thanks to Ilija). Throughput 
+    	\item I discussed my work from last week and Shawn added the following thoughts:
+    	\begin{itemize}
+    	    \item Router 1 to 2 displays an IP address based on the end of cable connection (router 2). Going Router 2 to 1 does the opposite, so it can be hard to determine when a route is the same just being traversed from a different direction. To crack this, we need to know how people name routers.
+    		\item How do we represent the network based on our limited sampling of it? We need an abstraction of the network that we can reason about, much like the Toy Network.
+    		\item Perhaps we could create a database of hops as vectors. Each hop could have metadata and real data. Time dependency makes this complicated.
+    	\end{itemize}
+    \end{itemize}
+
+    \item Read about Nada's work \href{https://docs.google.com/presentation/d/1HIrdwTaCa7Wkd2vGyN1xUlFuaAEpTP_CYZV5mBVHHWk/edit#slide=id.g8f9d31b3da_0_129}{synchronizing clocks}.
+    
+    \item Spoke with Ilija about working with the real data and pulling Sushant's work:
+    \begin{itemize}
+		\item Pull six hours of trace data and see how stable paths are. (One or two paths have almost..)
+		\item Review \href{https://github.com/sand-ci/Analytics}{previous work} (path is stable if all traffic..)
+		\item Stars/Firewall blocking ICMB packets
+		\item Distribution of number of hops per path.
+		\item Unique sources and destinations
+		\item Clean subset of data (even if that means tossing out half)
+	\end{itemize}
+\end{itemize}
+
+
+\subsection*{\weekday{1}}
+
+\begin{itemize}
+    \item Review Sushant's code:
+    \begin{itemize}
+    	\item Ran code connecting to ES and pulling basic statistics.
+    	\item Read through queries to try to understand how they were working.
+    	\item Tried to parse project structure to understand the function of various modules.
+    	\item Read up on Neo4j because that was a component I couldn't get working.
+    \end{itemize}
+    \item Met with Ilija to discuss Sushant's work:
+    \begin{itemize}
+    	\item There are some changes to elasticsearch:
+    	\begin{itemize}
+    		\item search first parameter must be "index="
+    		\item "true" now True
+    	\end{itemize}
+    	\item Elastic search querying language structure:
+    	\begin{itemize}
+    		\item Items in 'bool' need to be true in order to be pulled
+    		\item must = and, should = or
+    		\item Nested aggregation under "aggs"
+    	\end{itemize}
+    	\item Data pruning considerations:
+    	\begin{itemize}
+    		\item dest\_production has to be true (we're not interested in non-production stuff)
+    		\item If there are $<1000$ measurements, it is not sufficiently significant to use
+    		\item If n\_hops $<= 1$, something funky is going on and those hosts should be removed.
+    		\item Remove "looping" paths.
+    		\item Paths are stable if they have the same SHA1; pull only stable ones!
+    	\end{itemize}
+    	\item trace\_derived (ps\_trace but trimmed down)
+    	\begin{itemize}
+    		\item Updated every one minute
+    		\item Aggregate data form January of 2018 to present
+	    	\item Fast way to get unique sources and destinations		
+		\end{itemize}    	 
+    	
+    	\item For each hop, how many paths does it belong to. Which hop changed and what paths were effected.
+    	
+    	\item ps\_trace: "hops" array
+    	\item ", *" means ICMB packet was blocked
+    	\item asns: administrative domain of hops (we have a mapping of these to actual institutions)
+    	\item "path\_complete=true" means no stars
+    	\item rtts (relay time): time it took from source to first, second, third, etc. (remember: different packets per endpoint)
+    	\item Looping: IP appears more than once
+    	\item Make heatmap: sources on one axis, dest on the other, flag everything that was removed.
+    	\item route-sha1: String from all hops and makes sha1. Unique variable for each path, makes it fast to find the same path (use it to filter so only different/unique paths show).
+    	\item src and dest can be ipv4 and 6 for the same locations (dest\_host to src\_host).
+    \end{itemize}
+    \item Updated Sushant's code to make use of the insights from meeting with Ilija.
+\end{itemize}
+
+
+\subsection*{\weekday{2}}
+
+\begin{itemize}
+    \item Continued working on Sushant's code, but was uncertain what to do with it (as I wasn't sure if I could commit it back to Analytics or whether I should fork it).
+    \item Created my own independent network analytics project.
+    \begin{itemize}
+    	\item Learned about IPython extensions and \href{https://switowski.com/blog/ipython-autoreload}{autoreload}.
+    	\item Created a connection to elasticsearch.
+    \end{itemize}
+    \item Day was cut short due to an outage.
+\end{itemize}
+
+\subsection*{\weekday{3}}
+
+\begin{itemize}
+	\item Recovered work from the previous day.
+	\item Developed rudimentary project structure for \texttt{network\_analytics}
+	\item SAND Working Meeting
+	\begin{itemize}
+		\item \href{https://atlas-kibana.mwt2.org:5601/s/networking/app/kibana#/dashboard/35976890-d8ca-11ea-9344-2da4788d78a4?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(description:'This%20dashboard%20allows%20for%20the%20user%20to%20select%20both%20the%20source%20host,%20as%20well%20as%20any%20destination%20it%20may%20apply%20to,%20so%20to%20give%20all%20of%20the%20relevant%20information%20about%20the%20given%20parameters.%20This%20dashboard%20primarily%20focuses%20on%20the%20trace.',filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'45542740-0065-11e8-8f2f-ab6704660c79',key:src_host,negate:!f,params:(query:mwt2-ps02.campuscluster.illinois.edu),type:phrase),query:(match_phrase:(src_host:mwt2-ps02.campuscluster.illinois.edu)))),fullScreenMode:!f,options:(hidePanelTitles:!f,useMargins:!t),query:(language:kuery,query:''),timeRestore:!f,title:'Site-Based%20perfsonar%20Trace%20Breakdown%20ts-ih',viewMode:view)}{Tommy shared some visualizations he worked on that may be relevant to my work.} It allows exploring a connection between src-dest pairs and the routes between them.
+	\end{itemize}
+	\item Wrote a query to find unique pairs via double aggregation (on src then on dest). This was problematic as it quickly hit the bucket limit at only 60 srcs and 59 dests (when there are 386 of them, roughly).
+	\item Read about \href{https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html}{Query DSL}.
+	\item Read about \href{https://www.elastic.co/guide/en/elasticsearch/reference/current/copy-to.html}{\texttt{copy\_to}} as a means of addressing double aggregation.
+	\item Learned about \href{https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html}{terms queries} which I could use if I transform the output of a query to match the format.
+	\item Wrote a function to convert python lists of strings into ES query-friendly string describing a list (e.g., for use with \texttt{terms}).
+\end{itemize}
+
+
+\subsection*{\weekday{4}}
+
+\begin{itemize}
+	\item Finished reports.
+	\item Discussed query issues and limitations with Tommy.
+	\begin{itemize}
+		\item He suggested looking into \href{https://www.elastic.co/guide/en/elasticsearch/reference/7.8/search-fields.html#script-fields}{script fields} to address the double aggregation issue (i.e., make a single field that contains both source and destination).
+		\item Provided \href{https://atlas-kibana.mwt2.org:5601/s/networking/app/kibana#/management/kibana/index_patterns/45542740-0065-11e8-8f2f-ab6704660c79?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(tab:scriptedFields)}{an example} of a scripted field already written for \texttt{ps\_trace}.
+	\end{itemize}
+	\item Learned about \href{https://www.elastic.co/guide/en/elasticsearch/painless/master/painless-guide.html}{the Painless scripting language for ES}.
+	\item Spoke with Ilija about week's work and he had the following feedback:
+	\begin{itemize}
+		\item No need to do aggregation on \texttt{trace\_derived}: it's already aggregated!
+		\item Searching has limits on the number of results it can return (10,000?); Scanning is a different approach to getting data that doesn't have those limitations (can take days).
+	\end{itemize}
+\end{itemize}
+
+\section*{Achievements}
+\subsection*{I learned about...}
+\begin{itemize}
+	\item IPython extensions and \href{https://switowski.com/blog/ipython-autoreload}{autoreload}.
+	\item \href{https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html}{Query DSL}.
+	\begin{itemize}
+		\item Query vs Aggs
+		\item Bool queries and use of should/must vs filter
+		\item Score
+		\item Term, terms and ranges
+		\item \texttt{copy\_to} and script fields
+		\item Nested aggregation and bucket limits
+	\end{itemize}
+	\item Our data in Kibana.
+	\begin{itemize}
+		\item The various fields in \texttt{ps\_trace} and \texttt{trace\_derived}
+		\item There are 386 PS nodes that serve as both src and dest, if we filter out those that are only connected by one or fewer hops and those that do not have at least 1000 records.
+	\end{itemize}
+\end{itemize}
+
+\subsection*{I created...}
+\begin{itemize}
+	\item A \texttt{network\_analytics} project to contain my work with the real network:
+	\begin{itemize}
+		\item Created a rudimentary structure for the project.
+		\item Created a \texttt{main.ipynb} file to serve as my primary testing ground.
+		\item Wrote queries to get data about PS node pairs and the paths connecting them.
+	\end{itemize}
+
+\end{itemize}
+
+\pagebreak
+\section*{Roadblocks}
+
+\subsection*{Questions}
+
+\begin{itemize}
+	\item How do I make aggregate columns (e.g., \texttt{copy\_to}) in ElasticSearch using Python?
+	\item How do I get data in aggregates other than counts?
+	\item What does all the seemingly superfluous stuff returned in queries mean (e.g., "\_shards", the first set of "hits" when using both "query" and "aggs")?
+\end{itemize}
+
+\subsection*{Problems}
+
+\begin{itemize}
+	\item Currently I'm ruling out individual entries that don't meet my criteria (i.e., low hop average, low record count), but I really need to be doing this with the aggregate data for a path; I'm just not sure how to.
+\end{itemize}
+
+\subsection*{Challenges}
+
+\begin{itemize}
+    \item Trying to parlay the queries I had access to (either from Sushant or Inspect) into queries of my own design.
+    \item There were times when there must have been an issue with my ElasticSearch syntax, but it ran just fine, but would produce no results. I largely switched to using "filter" instead of "must" (\href{https://stackoverflow.com/questions/43349044/what-is-the-difference-between-must-and-filter-in-query-dsl-in-elasticsearch}{which apparently is more efficient anyway, because it doesn't calculate a score for results}).
+\end{itemize}
+
+\section*{Plans for Next Week}
+
+\begin{itemize}
+	\item Finish determining what stable paths exist:
+	\begin{itemize}
+		\item Improve method of finding PS pairs.
+		\item Rule out paths that have multiple route-sha1s
+	\end{itemize}
+	\item Convert hop data into discrete edges.
+	\begin{itemize}
+		\item Determine alternative names for edges (whether based on directionality or IPV4 vs IPV6).
+	\end{itemize}
+	\item Determine how many paths a specific edge is on.
+	\item Identify changes from expected paths:
+	\begin{itemize}
+		\item Determine if statistics are meaningfully different (e.g., significantly increased packetloss).
+		\item Identify edges that differ between iterations.
+	\end{itemize}
+\end{itemize}
+
+\end{document}

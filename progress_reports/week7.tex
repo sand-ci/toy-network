@@ -1,0 +1,191 @@
+\documentclass{weeklyreport}
+\usepackage[utf8]{inputenc}
+
+%%% Template Usage
+% 1. Go to "All Projects" and make a copy in Overleaf,
+% or download the source to modify locally.
+% 2. Fill in your name
+% 3. Set the reportdate to Monday of the current week
+
+
+\title{Progress Report}
+\author{Edris Qarghah}
+
+\DTMsavedate{reportdate}{2020-08-17}
+\date{Week of \DTMusedate{reportdate}}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Weekly Goals}
+
+
+\begin{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+\end{itemize}
+
+\section*{Daily Log}
+
+\subsection*{\weekday{0}}
+
+\begin{itemize}
+    \item Network Analytics Discussion meeting.
+    \begin{itemize}
+    	\item Petya is looking across all pairs of PS nodes and is measuring the standard deviation of packetloss across. Identifying pairs that have a sigma greater than 3. Not seeing very many. When looking at a single path, the data looks very different. Measuring variance is a done normally, though the definition is not Guassian (it's heavily skewed and distributed between 0 and 1). Toss things that are always at 100\% loss, but those that are almost always 100\% but dip down sometimes are worth exploring.
+    	\item Nada, Ilija's wife, was looking for an interesting data set to explore. Using \texttt{ps\_owd} and collected data. Filtered out all high latencies (all coming from slovakia). Removed hosts that didn't serve as source and destination. 60 measurements made per pair per minute, so why are there ones that have 10000+ measurements in the span of an hour. Whoever installed the node didn't choose enough NTP servers to test to or they just chose a bad one. We recommend at least 4 to 6 NTPs. If you do, you should be able to hold to a ms. Corrections improved things marginally, but didn't fix things!
+    	\item Soundar started loading data for ESNet. Heap error in Soundar's code.
+    	\item Tommy was working on redoing a lot of dashboards from last week, because they weren't very informative. Eliminated a dropdown bar from a bunch of pages that weren't using it. Made buttons more obviously buttons (mouse-overs). Made more narrative based visualizations (with Ilija's help). Renamed graphs to be more understandable. Select host, destination and see whether there is a significant variation in throughput.
+    	\item I discussed my work from last week:
+    	\begin{itemize}
+    	    \item Can't do complicated things in SQL, but Petya pointed out that it \href{https://www.elastic.co/what-is/elasticsearch-sql}{is an option}.
+    	    \item Can translate from SQL to DSL via the Console, but has to be cleaned up significantly.
+    	\end{itemize}
+    \end{itemize}
+
+    \item Read up on \href{https://elasticsearch-py.readthedocs.io/en/master/helpers.html}{helpers} and \href{https://elasticsearch-py.readthedocs.io/en/master/helpers.html#scan}{scan} for ES in python, and \href{https://www.elastic.co/guide/en/elasticsearch/reference/master/paginate-search-results.html#scroll-search-results}{scroll in ES}.
+    \begin{itemize}
+		\item 
+	\end{itemize}
+\end{itemize}
+
+
+\subsection*{\weekday{1}}
+
+\begin{itemize}
+    \item Learned about \href{https://realpython.com/introduction-to-python-generators/}{generators} and how to work with them in Python.
+    \item Adapted my code to use scan in place of search and leverage the resulting generator (instead of dictionary).
+    \begin{itemize}
+    	\item 
+    \end{itemize}
+    \item 
+    \begin{itemize}
+    	\item 
+    	\begin{itemize}
+    		\item 
+    	\end{itemize}
+    	\item 
+    	\begin{itemize}
+    		\item 
+    	\end{itemize}
+    	\item 
+    	\begin{itemize}
+    		\item 
+    	\end{itemize}
+    	\item 
+    	\begin{itemize}
+    		\item 	
+		\end{itemize}    	 
+    	
+    	\item 
+    \end{itemize}
+    \item 
+\end{itemize}
+
+
+\subsection*{\weekday{2}}
+
+\begin{itemize}
+    \item 
+    \begin{itemize}
+    	\item 
+    \end{itemize}
+    \item 
+\end{itemize}
+
+\subsection*{\weekday{3}}
+
+\begin{itemize}
+	\item Scan doesn't work with aggregations
+	\item Search doesn't give all results
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	\item 
+\end{itemize}
+
+
+\subsection*{\weekday{4}}
+
+\begin{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+\end{itemize}
+
+\section*{Achievements}
+\subsection*{I learned about...}
+\begin{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+\end{itemize}
+
+\subsection*{I created...}
+\begin{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+
+\end{itemize}
+
+\pagebreak
+\section*{Roadblocks}
+
+\subsection*{Questions}
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\subsection*{Problems}
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\subsection*{Challenges}
+
+\begin{itemize}
+    \item 
+\end{itemize}
+
+\section*{Plans for Next Week}
+
+\begin{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	\item 
+	\begin{itemize}
+		\item 
+	\end{itemize}
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,221 @@
+\documentclass{weeklyreport}
+\usepackage[utf8]{inputenc}
+
+%%% Template Usage
+% 1. Go to "All Projects" and make a copy in Overleaf,
+% or download the source to modify locally.
+% 2. Fill in your name
+% 3. Set the reportdate to Monday of the current week
+
+
+\title{Progress Report}
+\author{Edris Qarghah}
+
+\DTMsavedate{reportdate}{2020-08-03}
+\date{Week of \DTMusedate{reportdate}}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Weekly Goals}
+
+
+\begin{itemize}
+	\item Finalize tweaking of network distributions
+	\item Create means of visualizing individual path changes
+	\item Observe impacts of breaking an edge:
+	\begin{itemize}
+		\item Use traceroutes to identify path changes
+		\item Identify edges that are no longer being used
+		\item Infer identity of broken edge
+		\item Display impact on latency/packetloss
+	\end{itemize}
+	\item Observe impact of breaking multiple edges
+\end{itemize}
+
+\section*{Daily Log}
+
+\subsection*{\weekday{0}}
+
+\begin{itemize}
+    \item Network Analytics Discussion meeting.
+    \item Made temporary histograms to confirm distribution matching.
+    \begin{itemize}
+		\item Loaded histogram data to dataframes and scaled.
+		\item Tried alternative means of calculating latency (using the distribution).
+		\item Adjust packet-loss to account for the probable number of multiplications.
+		\item Added path hops, latency and packetloss to path lengths function.
+		\item Updated OWD distribution to account for offset.
+	\end{itemize}
+    \item Finished distribution matching (got Ilija's sign-off).
+    \item Fixed issue with lists containing one tuple being loaded as just a tuple.
+\end{itemize}
+
+\subsection*{\weekday{1}}
+
+\begin{itemize}
+    \item Added function to change edge values (i.e., latency, packetloss).
+    \item Manually changed latency and noted change in shortest paths.
+    \item Added shortest paths dictionary to the graph properties.
+    \begin{itemize}
+    	\item Encountered issues saving and loading shortest path dictionaries (GML does not like taking non-strings as dictionary keys).
+    \end{itemize}
+    \item Created means of converting a shortest path list to a list of edges.
+    \item Created preliminary means of getting changes to paths.
+    \item Added capacity to only draw paths connecting specific PS pairs.
+\end{itemize}
+
+
+\subsection*{\weekday{2}}
+
+\begin{itemize}
+    \item Added helper functions to address issue with non-string keys (i.e., pair to string, string to pair).
+    \item Improved graph path change function to account for bi-directionality of edges.
+    \item Met with Ilija about results of killing individual edges. Suggestions:
+    \begin{itemize}
+    	\item Kill edges entirely (rather than simply increasing latency)
+    	\item Systematically remove each individual edge in a graph (this may break the graph into multiple components).
+    \end{itemize}
+    \item Prepared slide for OSG update meeting.
+    \item Read about \href{https://multicoin.capital/2019/07/16/the-separation-of-time-and-state/}{time clock sync issues in blockchain and distributed systems}.
+    \item Ensured that path comparisons still functioned if path could not be completed after edge removal.
+\end{itemize}
+
+\subsection*{\weekday{3}}
+
+\begin{itemize}
+	\item Reviewed OSG update meeting presentation.
+	\item SAND Informal Working Meeting. 
+	\begin{itemize}
+		\item Learned more about what the others are doing:
+		\begin{itemize}
+			\item Tommy (UMich undergrad) is working on Kibana dashboards for network monitoring
+			\item Manjari (UMich undergrad) is working on a UI for network topology analysis (highly relevant to my work)
+			\item Petya (U Plovdiv PhD candidate) is working on a Plotly Dash ML web app to provide site summaries.
+		\end{itemize}
+		\item Tommy helped Petya with data pulling issues in ElasticSearch, which was instructive (she was pulling a set of IPs first as a source, then as a destination but was mysteriously getting the same result both ways).
+	\end{itemize}
+	\item Wrote functions to systematically remove each edge in a network then tally the resulting path changes.
+	\item Created histograms to display edge ambiguity.
+	\item Modified packetloss histogram to allow comparison of multiple iterations of graphs.
+	\item Updated hops histogram to actually be a histogram!
+	\item Patched issue with histogram obscuring original distribution by setting alpha to .5. A better solution needs to be found.
+\end{itemize}
+
+
+\subsection*{\weekday{4}}
+
+\begin{itemize}
+	\item Finished reports.
+	\item Caught an exception related to how shortest paths were being stored.
+	\item When getting path changes, fixed how edges were being removed from the changed\_edges dictionary.
+	\item Updated graph drawing:
+	\begin{itemize}
+		\item Adjusted perfsonar node color to make them easier to see (blue instead of brown).
+		\item Changed the default edge label to None (easier to see paths/colors that way).
+	\end{itemize}
+	\item Add naming and autosaving of histograms.
+	\item Updated slides following meeting to clear up ambiguity and structure them better.
+	\item Added details about the process for determining deleted edges:
+	\begin{enumerate}
+		\item Determine shortest paths between all PerfSONAR (PS) nodes in G.
+		\item Delete an edge and save the network as a new graph, H.
+		\item Determine shortest paths between PS nodes in H.
+		\item Compare shortest paths between graphs:
+		\begin{enumerate}
+			\item Record edges in each G path that aren’t in the corresponding H path (i.e., edges that are potentially the removed edge).
+			\item Confirm those edges were removed entirely from H (i.e., they are not on some other path in H).
+			\item Determine how many different paths each edge was removed from.
+			\begin{enumerate}
+				\item It’s likely that the edge removed from the most paths is the deleted edge.
+				\item If multiple edges were removed an equal number of times, there is ambiguity as to which was deleted.
+			\end{enumerate}
+		\end{enumerate}
+		\item Repeat 2-4 for every edge in G.
+	\end{enumerate}
+	\item Caught and corrected issue with edge ambiguity (wasn't fully excluding edges that appear elsewhere in the output graph). This involved a significant rewrite of get\_path\_changes.
+	\item Fixed font size on histograms.
+\end{itemize}
+
+\section*{Achievements}
+\subsection*{I learned about...}
+\begin{itemize}
+	\item The \href{https://multicoin.capital/2019/07/16/the-separation-of-time-and-state/}{“clock problem” for blockchain/“timechain” and distributed systems}.
+	\item Other students on the SAND team and how their work relates:
+	\begin{itemize}
+		\item Tommy (UMich undergrad) is working on Kibana dashboards for network monitoring
+		\item Manjari (UMich undergrad) is working on a UI for network topology analysis (highly relevant to my work)
+		\item Petya (U Plovdiv PhD candidate) is working on a Plotly Dash ML web app to provide site summaries.
+	\end{itemize}
+\end{itemize}
+
+\subsection*{I created...}
+\begin{itemize}
+	\item Means of identifying changed paths:
+	\begin{itemize}
+		\item Edges difference between old/new trace-routes.
+		\item Accounting for lack of edge directionality.
+	\end{itemize}
+	\item Means of narrowing down candidate edges:
+	\begin{itemize}
+		\item Discarding edges that remain on other paths.
+		\item Discarding edges not removed from all paths (only works if we know only one. edge)	
+	\end{itemize}
+	\item Means of visualizing changes:
+	\begin{itemize}
+		\item Graphs highlighting only relevant paths.
+		\item Histograms of candidate edges and impact to distributions.	
+	\end{itemize}
+\end{itemize}
+
+\pagebreak
+\section*{Roadblocks}
+
+\subsection*{Questions}
+
+\begin{itemize}
+	\item How can I narrow down the number of potentially impacted edges?
+	\item Is there a way to leverage edge adjacency to help make these determinations?
+\end{itemize}
+
+\subsection*{Problems}
+
+\begin{itemize}
+	\item Edges are indexed as tuples, making their use as keys in dictionaries difficult (ordering and saving as strings).
+	\item The toy network has ambiguity with even very limited curated data, which will only be worse with real data.
+\end{itemize}
+
+\subsection*{Challenges}
+
+\begin{itemize}
+    \item Highlighting changes to a graph without things getting too cumbersome.
+	\item Developing ways to summarize the impact of changes over many iterations that were intuitive/easy to understand.
+\end{itemize}
+
+\section*{Plans for Next Week}
+
+\begin{itemize}
+	\item Toy Network
+	\begin{itemize}
+		\item Further static network tomography:
+		\begin{itemize}
+			\item Dead vs. throttled edges
+			\item Adjusting for change to variable number of edges
+			\item Add bandwidth and measure bandwidth impact
+			\item Edge removal heatmap
+		\end{itemize}
+		\item Simulate network activity
+		\item Measure activity from specific nodes/generate Time Series
+		\item Develop tools for tomography and anomaly detection
+	\end{itemize}
+	\item Real Network
+	\begin{itemize}
+		\item Take snapshots of traceroutes at various times for comparison.
+		\item Try to determine whether traceroute variation can be used in the same manner as in toy network to identify dead/ailing edges.
+	\end{itemize}
+\end{itemize}
+
+\end{document}

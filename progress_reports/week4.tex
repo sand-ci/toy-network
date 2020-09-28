@@ -1,0 +1,127 @@
+\documentclass{weeklyreport}
+\usepackage[utf8]{inputenc}
+
+%%% Template Usage
+% 1. Go to "All Projects" and make a copy in Overleaf,
+% or download the source to modify locally.
+% 2. Fill in your name
+% 3. Set the reportdate to Monday of the current week
+
+
+\title{Progress Report}
+\author{Edris Qarghah}
+
+\DTMsavedate{reportdate}{2020-07-27}
+\date{Week of \DTMusedate{reportdate}}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Weekly Goals}
+
+
+\begin{itemize}
+	\item Learn about tomography strategies.
+	\item Develop tomography of static network (e.g., with latency/packet loss).
+	\item Ensure perfSONAR node distribution allows visibility into entire network.
+	\item Generate, store and draw shortest paths between PS nodes.
+	\item Stretch: Simulate network activity.
+	\item Stretch: Generate time series data based on that activity.
+	\item Stretch: Learn how this connects to anomaly detection.
+	\item Stretch: Explore how the model can be applied to real network data.
+\end{itemize}
+
+\section*{Daily Log}
+
+\subsection*{\weekday{0}}
+
+\begin{itemize}
+    \item Network Analytics Discussion meeting.
+    \item Spoke with Ilija about using latency and hop distributions to tune packet loss so that it is appropriate for the scale of the model.
+    \begin{itemize}
+    	\item PS Nodes: 10 (model), 250 (real)
+    	\item Nodes: 100 (model), 10000 (real)
+    \end{itemize}
+    \item Switched betweenness algorithms, per a suggestion from Andrew, dramatically increasing the speed of PerfSONAR node assignment.
+\end{itemize}
+
+
+
+\subsection*{\weekday{1}}
+
+\begin{itemize}
+    \item Created tables in Kibana to get latency (using one way delay) and hops (using trace), exported that data and added it to my project.
+    \item Wrote functions to add and remove perfsonar nodes from existing graphs.
+    \item Changed all nodes to text.
+    \item Broke graphs because nearest distance tables relied on integer indexing.
+\end{itemize}
+
+\subsection*{\weekday{2}}
+
+\begin{itemize}
+    \item Fixed graphs by implementing consistent storage of nodes as strings and conversion to ints where necessary.
+    \item Added versioning to graphs.
+    \item Added save graph feature for modified graphs.
+    \item Added functions to change perfsonar nodes
+\end{itemize}
+
+\subsection*{\weekday{3}}
+
+\begin{itemize}
+	\item SAND informal working meeting
+    \item Tweaked edges to find
+    \item Factored out edge creation to allow more control
+    \item 
+\end{itemize}
+
+
+\subsection*{\weekday{4}}
+
+\begin{itemize}
+	\item Finished reports.
+	\item 
+\end{itemize}
+
+\section*{Achievements}
+\subsection*{I learned about...}
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\subsection*{I created...}
+\begin{itemize}
+	\item 
+
+\end{itemize}
+
+\pagebreak
+\section*{Roadblocks}
+
+\subsection*{Questions}
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\subsection*{Problems}
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\subsection*{Challenges}
+
+\begin{itemize}
+    \item 
+\end{itemize}
+
+\section*{Plans for Next Week}
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\end{document}

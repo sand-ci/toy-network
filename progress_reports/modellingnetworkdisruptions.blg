@@ -1,0 +1,17 @@
+[0] Config.pm:312> INFO - This is Biber 2.15 (beta)
+[1] Config.pm:315> INFO - Logfile is 'modellingnetworkdisruptions.blg'
+[324] biber-MSWIN64:330> INFO - === 
+[393] Biber.pm:415> INFO - Reading 'modellingnetworkdisruptions.bcf'
+[779] Biber.pm:952> INFO - Found 23 citekeys in bib section 0
+[836] Biber.pm:4334> INFO - Processing section 0
+[900] Biber.pm:4523> INFO - Looking for bibtex format file 'citations.bib' for section 0
+[1790] bibtex.pm:1682> INFO - LaTeX decoding ...
+[1872] bibtex.pm:1494> INFO - Found BibTeX data source 'citations.bib'
+[2160] Utils.pm:395> WARN - BibTeX subsystem: C:\Users\foomp\AppData\Local\Temp\biber_tmp_3o_g\56f1c414433802ad7930cb94138c5670_14760.utf8, line 71, warning: 1 characters of junk seen at toplevel
+[2251] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[2251] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[2251] Biber.pm:4162> INFO - Sorting list 'none/global//global/global' of type 'entry' with template 'none' and locale 'en-US'
+[2251] Biber.pm:4168> INFO - No sort tailoring available for locale 'en-US'
+[2332] bbl.pm:651> INFO - Writing 'modellingnetworkdisruptions.bbl' with encoding 'UTF-8'
+[2367] bbl.pm:754> INFO - Output to modellingnetworkdisruptions.bbl
+[2368] Biber.pm:128> INFO - WARNINGS: 1
